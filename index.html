@@ -1,179 +1,197 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BCT | TERMINAL v2.0</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BCT | NEURAL CONTROL CENTER</title>
     
-    <!-- Fonts & UI Kit -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono:wght@300;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
     <style>
         :root {
-            --neon-red: #ff003c;
-            --neon-glow: rgba(255, 0, 60, 0.3);
-            --bg-deep: #030305;
-            --panel-bg: rgba(15, 15, 20, 0.95);
-            --input-bg: #0a0a0c;
-            --text-cyan: #00f2ff;
-            --border-color: rgba(0, 242, 255, 0.1);
+            --primary: #00f2ff;
+            --secondary: #7000ff;
+            --danger: #ff0055;
+            --bg-body: #050608;
+            --card-bg: rgba(15, 18, 25, 0.8);
+            --border-color: rgba(0, 242, 255, 0.15);
+            --glass: rgba(255, 255, 255, 0.03);
         }
 
-        * { box-sizing: border-box; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        * { box-sizing: border-box; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
 
         body {
-            background-color: var(--bg-deep);
+            background-color: var(--bg-body);
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
             background-image: 
-                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
-                linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
-            background-size: 100% 2px, 3px 100%;
-            color: #fff;
-            font-family: 'JetBrains Mono', monospace;
-            margin: 0; padding: 20px;
+                linear-gradient(var(--border-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+            background-size: 40px 40px;
         }
 
-        .container { max-width: 900px; margin: 0 auto; position: relative; }
-
-        /* Modern Header */
-        header {
-            background: var(--panel-bg);
-            border: 1px solid var(--neon-red);
+        /* Responsive Container */
+        .app-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
             padding: 20px;
+        }
+
+        /* Header */
+        header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 0 20px var(--neon-glow);
+            flex-direction: column;
+            gap: 15px;
+            padding: 30px 0;
+            border-bottom: 1px solid var(--border-color);
             margin-bottom: 30px;
-            clip-path: polygon(0 0, 100% 0, 100% 80%, 95% 100%, 0 100%);
         }
 
-        .logo { font-family: 'Orbitron', sans-serif; font-size: 22px; letter-spacing: 3px; color: var(--neon-red); text-transform: uppercase; }
-        .logo span { color: #fff; text-shadow: 0 0 10px #fff; }
+        @media (min-width: 768px) {
+            header { flex-direction: row; justify-content: space-between; align-items: center; }
+        }
 
-        /* Login Screen */
+        .brand { font-family: 'Orbitron'; font-size: 24px; color: var(--primary); letter-spacing: 2px; }
+        .brand span { color: #fff; opacity: 0.8; }
+
+        /* Auth Screen */
         #login-overlay {
-            position: fixed; inset: 0; background: #000; z-index: 9999;
-            display: flex; align-items: center; justify-content: center;
+            position: fixed; inset: 0; background: var(--bg-body); z-index: 10000;
+            display: flex; align-items: center; justify-content: center; padding: 20px;
         }
-        .login-box {
-            background: var(--panel-bg); border: 1px solid var(--neon-red);
-            padding: 40px; width: 350px; text-align: center; border-radius: 5px;
+        .login-card {
+            background: var(--card-bg); border: 1px solid var(--primary);
+            padding: 40px; width: 100%; max-width: 400px; border-radius: 12px;
+            box-shadow: 0 0 40px rgba(0, 242, 255, 0.1); text-align: center;
         }
 
         /* Section Styling */
-        .section-container {
-            background: var(--panel-bg);
+        .section-card {
+            background: var(--card-bg);
             border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
             margin-bottom: 30px;
-            padding: 20px;
-            border-radius: 4px;
-        }
-        .section-header-input {
-            background: transparent; border: none; border-bottom: 2px solid var(--neon-red);
-            color: #fff; font-family: 'Orbitron'; font-size: 20px; padding: 5px; width: 60%;
+            backdrop-filter: blur(10px);
         }
 
-        /* Accordion Tool Item */
-        .tool-item {
-            background: var(--input-bg);
-            border: 1px solid #1a1a1c;
-            margin-top: 10px;
-            overflow: hidden;
-            border-radius: 4px;
+        .section-header {
+            display: flex; align-items: center; gap: 15px; margin-bottom: 20px;
         }
-
-        .tool-header {
-            padding: 15px 20px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.02);
-        }
-        .tool-header:hover { background: rgba(255, 0, 60, 0.1); }
-        .tool-header i.chevron { transition: 0.3s; color: var(--text-cyan); }
         
-        /* Expand/Collapse Logic */
-        .tool-body {
-            max-height: 0;
-            padding: 0 20px;
-            overflow: hidden;
-            border-top: 0px solid var(--neon-red);
-            opacity: 0;
+        .section-title-input {
+            background: var(--glass); border: 1px solid transparent;
+            color: #fff; font-size: 18px; font-weight: 600; padding: 8px 15px;
+            border-radius: 6px; width: 100%;
         }
-        .tool-item.active .tool-body {
-            max-height: 1000px;
-            padding: 20px;
-            opacity: 1;
-            border-top: 1px solid rgba(255, 0, 60, 0.3);
-        }
-        .tool-item.active .chevron { transform: rotate(180deg); }
+        .section-title-input:focus { border-color: var(--primary); outline: none; }
 
-        /* Inputs */
-        .field-group { margin-bottom: 15px; }
-        label { font-size: 10px; color: var(--text-cyan); text-transform: uppercase; letter-spacing: 1px; }
-        input, textarea {
-            width: 100%; background: #000; border: 1px solid #222;
-            color: #ddd; padding: 10px; font-family: 'JetBrains Mono';
-            margin-top: 5px; border-radius: 2px;
+        /* Tool Item - Compact & Professional */
+        .tool-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 10px;
+            border-radius: 8px;
+            overflow: hidden;
         }
-        input:focus { border-color: var(--neon-red); outline: none; }
+        .tool-item:hover { border-color: var(--primary); background: rgba(0, 242, 255, 0.03); }
+
+        .tool-main {
+            padding: 15px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .tool-info { display: flex; align-items: center; gap: 15px; }
+        .drag-handle { color: #444; cursor: grab; padding-right: 10px; }
+        .tool-icon-preview { color: var(--primary); font-size: 18px; width: 25px; text-align: center; }
+
+        .tool-edit-panel {
+            display: none;
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.2);
+        }
+        .tool-item.active .tool-edit-panel { display: block; }
+
+        /* Grid Layout for Inputs */
+        .input-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        @media (min-width: 600px) { .input-grid { grid-template-columns: 1fr 1fr; } }
+
+        .field { margin-bottom: 15px; }
+        label { display: block; font-size: 11px; text-transform: uppercase; color: #777; margin-bottom: 5px; font-weight: 600; }
+        
+        input, textarea, select {
+            width: 100%; background: #0a0b0e; border: 1px solid #222;
+            color: #ddd; padding: 12px; border-radius: 6px; font-family: 'JetBrains Mono';
+            font-size: 13px; outline: none;
+        }
+        input:focus { border-color: var(--primary); }
 
         /* Buttons */
         .btn {
-            background: transparent; border: 1px solid var(--text-cyan);
-            color: var(--text-cyan); padding: 10px 20px; cursor: pointer;
-            font-family: 'Orbitron'; font-size: 12px;
+            padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px; font-size: 13px;
+            border: 1px solid var(--primary); background: transparent; color: var(--primary);
         }
-        .btn:hover { background: var(--text-cyan); color: #000; box-shadow: 0 0 15px var(--text-cyan); }
-        
-        .btn-add-tool { border-style: dashed; width: 100%; margin-top: 15px; color: #888; border-color: #333; }
-        .btn-add-tool:hover { border-color: var(--neon-red); color: var(--neon-red); }
+        .btn:hover { background: var(--primary); color: #000; box-shadow: 0 0 15px rgba(0, 242, 255, 0.3); }
 
-        .btn-save {
-            position: fixed; bottom: 30px; right: 30px;
-            background: var(--neon-red); color: white; border: none;
-            padding: 20px 40px; font-size: 18px; font-weight: bold;
-            box-shadow: 0 0 30px var(--neon-glow); border-radius: 50px;
-            z-index: 100; cursor: pointer;
+        .btn-add { border-color: #444; color: #999; width: 100%; justify-content: center; border-style: dashed; }
+        .btn-add:hover { border-color: var(--primary); color: var(--primary); }
+
+        .btn-delete { color: var(--danger); border-color: rgba(255, 0, 85, 0.2); }
+        .btn-delete:hover { background: var(--danger); color: #fff; }
+
+        .btn-save-cloud {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: var(--primary); color: #000; padding: 15px 40px;
+            border-radius: 50px; font-family: 'Orbitron'; font-size: 16px;
+            box-shadow: 0 10px 30px rgba(0, 242, 255, 0.3); z-index: 1000;
+            width: max-content; border: none;
         }
-        .btn-save:hover { transform: scale(1.1); box-shadow: 0 0 50px var(--neon-red); }
+        .btn-save-cloud:hover { transform: translateX(-50%) translateY(-5px); }
 
-        .delete-icon { color: #444; cursor: pointer; }
-        .delete-icon:hover { color: var(--neon-red); }
+        /* Sortable Helpers */
+        .sortable-ghost { opacity: 0.4; border: 2px dashed var(--primary) !important; background: transparent !important; }
 
-        .tool-title-display { font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 10px; }
-        .tool-title-display i { color: var(--neon-red); }
-
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
     </style>
 </head>
 <body>
 
-    <!-- Auth Layer -->
     <div id="login-overlay">
-        <div class="login-box">
-            <h2 style="font-family: 'Orbitron'; color: var(--neon-red);">TERMINAL LOGIN</h2>
-            <input type="password" id="admin-pass" placeholder="ACCESS KEY" style="text-align: center; margin-bottom: 20px;">
+        <div class="login-card">
+            <h2 style="font-family: 'Orbitron'; color: var(--primary);">SECURE ACCESS</h2>
+            <p style="color: #666; font-size: 12px; margin-bottom: 25px;">Enter decryption key to bypass</p>
+            <input type="password" id="admin-pass" placeholder="••••••••" style="text-align: center; margin-bottom: 20px; font-size: 20px;" />
             <button class="btn" onclick="checkPass()" style="width: 100%;">AUTHENTICATE</button>
         </div>
     </div>
 
-    <div class="container">
+    <div class="app-wrapper">
         <header>
-            <div class="logo">BCT <span>SYSTEM CONFIG</span></div>
-            <button class="btn" onclick="addSection()"><i class="fas fa-plus"></i> NEW SECTION</button>
+            <div class="brand">BCT <span>// SYSTEM_V3</span></div>
+            <button class="btn" onclick="addSection()">
+                <i class="fas fa-plus-circle"></i> ADD NEW CATEGORY
+            </button>
         </header>
 
         <div id="editor-container">
             <!-- Dynamic Content -->
         </div>
 
-        <div style="height: 100px;"></div> <!-- Spacer -->
-        
-        <button class="btn btn-save" id="sync-btn" onclick="updateSystem()">
-            <i class="fas fa-sync-alt"></i> UPDATE TO CLOUD
+        <div style="height: 120px;"></div>
+        <button class="btn btn-save-cloud" id="sync-btn" onclick="updateSystem()">
+            <i class="fas fa-sync-alt"></i> PUSH TO NEURAL LINK
         </button>
     </div>
 
@@ -187,7 +205,7 @@
                 document.getElementById('login-overlay').style.display = 'none';
                 loadCurrentData();
             } else {
-                Swal.fire('ACCESS DENIED', 'Invalid decryption key.', 'error');
+                Swal.fire({ icon: 'error', title: 'DENIED', background: '#0a0b0e', color: '#ff0055' });
             }
         }
 
@@ -200,7 +218,7 @@
                 mainData = data.record;
                 renderEditor();
             } catch (e) {
-                Swal.fire('Error', 'Could not sync with neural link.', 'error');
+                Swal.fire('ERROR', 'Link synchronization failed.', 'error');
             }
         }
 
@@ -210,67 +228,84 @@
 
             mainData.sections.forEach((sec, sIdx) => {
                 const secDiv = document.createElement('div');
-                secDiv.className = 'section-container';
+                secDiv.className = 'section-card';
                 secDiv.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                        <input type="text" class="section-header-input" value="${sec.section_title}" onchange="updateSecTitle(${sIdx}, this.value)">
-                        <div style="display:flex; align-items:center; gap:15px;">
-                            <input type="color" value="${sec.title_color}" onchange="updateSecColor(${sIdx}, this.value)" style="width:30px; height:30px; border:none; padding:0; background:none; cursor:pointer;">
-                            <i class="fas fa-trash delete-icon" onclick="removeSection(${sIdx})"></i>
-                        </div>
+                    <div class="section-header">
+                        <input type="text" class="section-title-input" value="${sec.section_title}" onchange="updateSecTitle(${sIdx}, this.value)">
+                        <input type="color" value="${sec.title_color}" onchange="updateSecColor(${sIdx}, this.value)" style="width:35px; height:35px; border:none; background:none; cursor:pointer;">
+                        <i class="fas fa-trash-alt btn-delete" style="cursor:pointer; padding: 10px;" onclick="removeSection(${sIdx})"></i>
                     </div>
                     
-                    <div id="tools-${sIdx}">
+                    <div class="tools-container" id="tools-list-${sIdx}" data-section="${sIdx}">
                         ${sec.tools.map((tool, tIdx) => `
-                            <div class="tool-item" id="tool-${sIdx}-${tIdx}">
-                                <div class="tool-header" onclick="toggleTool(${sIdx}, ${tIdx})">
-                                    <div class="tool-title-display">
-                                        <i class="${tool.icon || 'fas fa-cube'}"></i>
-                                        <span>${tool.title || 'Untitled Tool'}</span>
+                            <div class="tool-item" data-id="${tIdx}">
+                                <div class="tool-main" onclick="toggleEdit(this)">
+                                    <div class="tool-info">
+                                        <i class="fas fa-ellipsis-v drag-handle"></i>
+                                        <div class="tool-icon-preview"><i class="${tool.icon}"></i></div>
+                                        <span style="font-weight:600; font-size:14px;">${tool.title}</span>
                                     </div>
-                                    <i class="fas fa-chevron-down chevron"></i>
+                                    <i class="fas fa-chevron-down" style="font-size:12px; color:#444;"></i>
                                 </div>
-                                <div class="tool-body">
-                                    <div class="field-group">
-                                        <label>Tool Title</label>
-                                        <input type="text" value="${tool.title}" oninput="updateTool(${sIdx}, ${tIdx}, 'title', this.value)">
-                                    </div>
-                                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-                                        <div class="field-group">
+                                <div class="tool-edit-panel">
+                                    <div class="input-grid">
+                                        <div class="field">
+                                            <label>Module Title</label>
+                                            <input type="text" value="${tool.title}" oninput="updateTool(${sIdx}, ${tIdx}, 'title', this.value)">
+                                        </div>
+                                        <div class="field">
                                             <label>Icon Class (FontAwesome)</label>
                                             <input type="text" value="${tool.icon}" oninput="updateTool(${sIdx}, ${tIdx}, 'icon', this.value)">
                                         </div>
-                                        <div class="field-group">
-                                            <label>Tag Text</label>
+                                    </div>
+                                    <div class="input-grid">
+                                        <div class="field">
+                                            <label>Status Tag</label>
                                             <input type="text" value="${tool.tag}" oninput="updateTool(${sIdx}, ${tIdx}, 'tag', this.value)">
                                         </div>
+                                        <div class="field">
+                                            <label>Redirect URL</label>
+                                            <input type="text" value="${tool.url}" oninput="updateTool(${sIdx}, ${tIdx}, 'url', this.value)">
+                                        </div>
                                     </div>
-                                    <div class="field-group">
-                                        <label>Target URL</label>
-                                        <input type="text" value="${tool.url}" oninput="updateTool(${sIdx}, ${tIdx}, 'url', this.value)">
-                                    </div>
-                                    <div class="field-group">
+                                    <div class="field">
                                         <label>Description</label>
-                                        <textarea rows="3" oninput="updateTool(${sIdx}, ${tIdx}, 'desc', this.value)">${tool.desc}</textarea>
+                                        <textarea rows="2" oninput="updateTool(${sIdx}, ${tIdx}, 'desc', this.value)">${tool.desc}</textarea>
                                     </div>
                                     <div style="text-align:right;">
-                                        <button class="btn" style="border-color:var(--neon-red); color:var(--neon-red); font-size:10px;" onclick="removeTool(${sIdx}, ${tIdx})">DELETE TOOL</button>
+                                        <button class="btn btn-delete" onclick="removeTool(${sIdx}, ${tIdx})" style="font-size:10px;">DELETE MODULE</button>
                                     </div>
                                 </div>
                             </div>
                         `).join('')}
                     </div>
-                    <button class="btn btn-add-tool" onclick="addTool(${sIdx})">+ ADD NEW MODULE</button>
+                    <button class="btn btn-add" onclick="addTool(${sIdx})">+ ADD MODULE</button>
                 `;
                 container.appendChild(secDiv);
+                initSortable(sIdx);
             });
         }
 
-        // --- Core Functions ---
+        function initSortable(sIdx) {
+            const el = document.getElementById(`tools-list-${sIdx}`);
+            new Sortable(el, {
+                group: 'shared-sections',
+                handle: '.drag-handle',
+                animation: 200,
+                ghostClass: 'sortable-ghost',
+                onEnd: (evt) => {
+                    const fromSecIdx = parseInt(evt.from.dataset.section);
+                    const toSecIdx = parseInt(evt.to.dataset.section);
+                    const [movedItem] = mainData.sections[fromSecIdx].tools.splice(evt.oldIndex, 1);
+                    mainData.sections[toSecIdx].tools.splice(evt.newIndex, 0, movedItem);
+                    // Refresh indices without full render if possible, but for stability:
+                    renderEditor();
+                }
+            });
+        }
 
-        function toggleTool(sIdx, tIdx) {
-            const el = document.getElementById(`tool-${sIdx}-${tIdx}`);
-            el.classList.toggle('active');
+        function toggleEdit(el) {
+            el.parentElement.classList.toggle('active');
         }
 
         function updateSecTitle(sIdx, val) { mainData.sections[sIdx].section_title = val; }
@@ -280,42 +315,33 @@
         }
         function updateTool(sIdx, tIdx, field, val) { 
             mainData.sections[sIdx].tools[tIdx][field] = val;
-            if(field === 'title') {
-                // Real-time title update in header
-                document.querySelector(`#tool-${sIdx}-${tIdx} .tool-title-display span`).innerText = val;
-            }
         }
 
         function addSection() {
-            mainData.sections.push({ section_title: "NEW CATEGORY", title_color: "#ff003c", tools: [] });
+            mainData.sections.push({ section_title: "NEW CATEGORY", title_color: "#00f2ff", tools: [] });
             renderEditor();
         }
 
         function removeSection(sIdx) {
             Swal.fire({
-                title: 'Destroy Section?',
-                text: "All modules inside will be purged!",
+                title: 'Wipe Category?',
+                text: "All modules inside will be lost.",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#ff003c',
-                background: '#0a0a0c',
+                confirmButtonColor: '#ff0055',
+                background: '#0a0b0e',
                 color: '#fff'
-            }).then((res) => {
-                if(res.isConfirmed) {
-                    mainData.sections.splice(sIdx, 1);
-                    renderEditor();
-                }
-            });
+            }).then((res) => { if(res.isConfirmed) { mainData.sections.splice(sIdx, 1); renderEditor(); } });
         }
 
         function addTool(sIdx) {
             mainData.sections[sIdx].tools.push({
-                title: "New Tool",
-                desc: "Description of the tool...",
+                title: "New Module",
+                desc: "Module description goes here...",
                 url: "https://",
-                icon: "fas fa-microchip",
-                tag: "ACTIVE",
-                tag_class: "tag-red",
+                icon: "fas fa-atom",
+                tag: "LIVE",
+                tag_class: "tag-blue",
                 arrow_color: mainData.sections[sIdx].title_color
             });
             renderEditor();
@@ -328,21 +354,18 @@
 
         async function updateSystem() {
             const btn = document.getElementById('sync-btn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
-            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SYNCING...';
             try {
                 const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
                     body: JSON.stringify(mainData)
                 });
-                if(response.ok) {
-                    Swal.fire({ icon: 'success', title: 'SYSTEM UPDATED', background: '#0a0a0c', color: '#00f2ff' });
-                }
+                if(response.ok) Swal.fire({ icon: 'success', title: 'SYNC COMPLETE', background: '#0a0b0e', color: '#00f2ff' });
             } catch (e) {
-                Swal.fire('ERROR', 'Link synchronization failed.', 'error');
+                Swal.fire('FAILED', 'Neural sync failed.', 'error');
             }
-            btn.innerHTML = '<i class="fas fa-sync-alt"></i> UPDATE TO CLOUD';
+            btn.innerHTML = '<i class="fas fa-sync-alt"></i> PUSH TO NEURAL LINK';
         }
     </script>
 </body>
